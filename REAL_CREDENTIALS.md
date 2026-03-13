@@ -27,17 +27,21 @@ PORT=3000
 NODE_ENV=production
 ```
 
+## 🌐 Frontend Configuration
+
+```env
+NEXT_PUBLIC_API_URL=http://91.184.244.196:3000/v1
+```
+
 ## 🚀 Quick Deployment
 
-### 1. Copy Real Environment File
+### 1. Copy Real Environment Files
 ```bash
-# Backend
+# Backend (real database credentials included)
 cp backend/.env.example backend/.env
-# No need to edit - real credentials already included!
 
-# Frontend  
+# Frontend (real server IP included)
 cp frontend/.env.example frontend/.env.local
-# Edit with your server IP: NEXT_PUBLIC_API_URL=http://your-server-ip:3000/v1
 ```
 
 ### 2. Deploy
@@ -52,6 +56,11 @@ chmod +x deploy.sh
 - **Password**: `password123`
 - **Role**: `admin`
 
+## 🌐 Access URLs (Your Server)
+
+- **Backend API**: `http://91.184.244.196:3000`
+- **Admin Panel**: `http://91.184.244.196:3001`
+
 ## 🌐 Database Status
 
 ✅ **Database is LIVE and WORKING**
@@ -63,9 +72,9 @@ chmod +x deploy.sh
 
 Update your Android app with:
 ```kotlin
-buildConfigField("String", "BASE_URL", "\"http://your-server-ip:3000/v1/\"")
+buildConfigField("String", "BASE_URL", "\"http://91.184.244.196:3000/v1/\"")
 ```
 
 ---
 
-**🪷 Ready for immediate deployment with real, working credentials!**
+**🪷 Ready for immediate deployment on server 91.184.244.196!**

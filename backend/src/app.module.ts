@@ -11,6 +11,7 @@ import { LeaderboardModule } from './modules/leaderboard/leaderboard.module';
 import { ReferralsModule } from './modules/referrals/referrals.module';
 import { ConfigAppModule } from './modules/config/config-app.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -60,5 +61,6 @@ import { AdminModule } from './modules/admin/admin.module';
     ConfigAppModule,
     AdminModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule { }

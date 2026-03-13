@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource, Between, MoreThanOrEqual } from 'typeorm';
+import { Repository, DataSource, Between, MoreThanOrEqual, In } from 'typeorm';
 import { User, UserStatus, UserRole } from '../users/user.entity';
 import { Wallet } from '../wallet/wallet.entity';
 import { Transaction, TransactionStatus } from '../transactions/transaction.entity';
@@ -63,7 +63,6 @@ export class AdminService {
     // ━━━━━━━━━━━━━ USERS ━━━━━━━━━━━━━
     async getUsers(page = 1, limit = 20, search?: string, status?: string) {
         const qb = this.userRepo.createQueryBuilder('u')
-            .leftJoinAndSelect('u.wallet', 'w')
             .orderBy('u.createdAt', 'DESC')
             .skip((page - 1) * limit)
             .take(limit);
@@ -76,6 +75,15 @@ export class AdminService {
         }
 
         const [users, total] = await qb.getManyAndCount();
+        
+        // Get wallets separately for now
+        const userIds = users.map(u => u.id);
+        const wallets = userIds.length > 0 ? await this.walletRepo.find({
+            where: { userId: In(userIds) }
+        }) : [];
+        
+        const walletMap = new Map(wallets.map(w => [w.userId, w]));
+        
         return {
             users: users.map((u) => ({
                 id: u.id,
@@ -90,11 +98,11 @@ export class AdminService {
                 isPhoneVerified: u.isPhoneVerified,
                 totalReferrals: u.totalReferrals,
                 createdAt: u.createdAt,
-                wallet: u.wallet ? {
-                    balance: u.wallet.balance,
-                    totalEarned: u.wallet.totalEarned,
-                    totalWithdrawn: u.wallet.totalWithdrawn,
-                    frozenBalance: u.wallet.frozenBalance,
+                wallet: walletMap.get(u.id) ? {
+                    balance: walletMap.get(u.id)!.balance,
+                    totalEarned: walletMap.get(u.id)!.totalEarned,
+                    totalWithdrawn: walletMap.get(u.id)!.totalWithdrawn,
+                    frozenBalance: walletMap.get(u.id)!.frozenBalance,
                 } : null,
             })),
             total,

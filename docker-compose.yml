@@ -1,40 +1,53 @@
 version: '3.8'
 
 services:
+  # Backend API
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3002:3002"
     environment:
       - NODE_ENV=production
-    env_file:
-      - ./backend/.env
+      - DATABASE_URL=postgresql://postgres.zdqxygisywmjoeimjflc:wBJs%2Fy%3FP%21d.%25U6w@aws-1-ap-south-1.pooler.supabase.com:6543/postgres?sslmode=require
+      - JWT_SECRET=lotus365_super_secret_jwt_key_2026_production
+      - JWT_REFRESH_SECRET=lotus365_refresh_secret_key_2026_production
+      - CORS_ORIGIN=http://91.184.244.196:3003,https://admin.lotus365.app
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - lotus365-network
 
+  # Frontend Admin Panel
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
-      - "3001:3001"
+      - "3003:3000"
     environment:
+      - NEXT_PUBLIC_API_URL=http://91.184.244.196:3002/v1
       - NODE_ENV=production
-    env_file:
-      - ./frontend/.env.local
+    restart: unless-stopped
     depends_on:
       - backend
-    restart: unless-stopped
     networks:
       - lotus365-network
 
+  # Nginx Reverse Proxy
   nginx:
     image: nginx:alpine
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./ssl:/etc/nginx/ssl
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
     depends_on:
       - backend
       - frontend
@@ -45,3 +58,6 @@ services:
 networks:
   lotus365-network:
     driver: bridge
+
+volumes:
+  postgres_data:

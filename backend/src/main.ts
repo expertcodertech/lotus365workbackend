@@ -10,7 +10,12 @@ async function bootstrap() {
 
   // CORS
   app.enableCors({
-    origin: ['http://localhost:3001', 'https://admin.lotus365.app'],
+    origin: [
+      'http://localhost:3001', 
+      'https://admin.lotus365.app',
+      'http://91.184.244.196:3001',
+      'http://91.184.244.196'
+    ],
     credentials: true,
   });
 

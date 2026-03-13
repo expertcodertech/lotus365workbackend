@@ -102,6 +102,11 @@ print_info "Building backend..."
 npm run build
 print_status "Backend built successfully"
 
+# Create admin user
+print_info "Creating admin user..."
+npm run create-admin
+print_status "Admin user setup complete"
+
 # Start backend with PM2
 print_info "Starting backend with PM2..."
 pm2 stop lotus365-backend 2>/dev/null || true

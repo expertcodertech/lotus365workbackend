@@ -84,9 +84,9 @@ fi
 # Frontend environment
 if [ ! -f "frontend/.env.local" ]; then
     cp frontend/.env.example frontend/.env.local
-    # Update with current server IP
-    sed -i "s|http://91.184.244.196:3000/v1|http://$SERVER_IP:3000/v1|g" frontend/.env.local
-    print_status "Frontend environment configured with server IP: $SERVER_IP"
+    # Update with current server IP and port 3002
+    sed -i "s|http://91.184.244.196:3000/v1|http://$SERVER_IP:3002/v1|g" frontend/.env.local
+    print_status "Frontend environment configured with server IP: $SERVER_IP on port 3002"
 else
     print_status "Frontend environment already exists"
 fi
@@ -107,12 +107,12 @@ print_info "Creating admin user..."
 npm run create-admin
 print_status "Admin user setup complete"
 
-# Start backend with PM2
+# Start backend with PM2 on port 3002
 print_info "Starting backend with PM2..."
 pm2 stop lotus365-backend 2>/dev/null || true
 pm2 delete lotus365-backend 2>/dev/null || true
-pm2 start dist/main.js --name "lotus365-backend"
-print_status "Backend started on port 3000"
+PORT=3002 pm2 start dist/main.js --name "lotus365-backend"
+print_status "Backend started on port 3002"
 
 # Go back to root directory
 cd ..
@@ -128,12 +128,12 @@ print_info "Building frontend..."
 npm run build
 print_status "Frontend built successfully"
 
-# Start frontend with PM2
+# Start frontend with PM2 on port 3003
 print_info "Starting frontend with PM2..."
 pm2 stop lotus365-frontend 2>/dev/null || true
 pm2 delete lotus365-frontend 2>/dev/null || true
-pm2 start npm --name "lotus365-frontend" -- start
-print_status "Frontend started on port 3001"
+PORT=3003 pm2 start npm --name "lotus365-frontend" -- start
+print_status "Frontend started on port 3003"
 
 # Save PM2 configuration
 pm2 save
@@ -149,18 +149,18 @@ server {
     listen 80;
     server_name $SERVER_IP;
 
-    # Backend API
+    # Backend API on port 3002
     location /v1/ {
-        proxy_pass http://localhost:3000/v1/;
+        proxy_pass http://localhost:3002/v1/;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto \$scheme;
     }
 
-    # Frontend Admin Panel
+    # Frontend Admin Panel on port 3003
     location / {
-        proxy_pass http://localhost:3001/;
+        proxy_pass http://localhost:3003/;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
@@ -182,8 +182,8 @@ print_status "Nginx configured and reloaded"
 print_info "Configuring firewall..."
 sudo ufw allow ssh
 sudo ufw allow 'Nginx Full'
-sudo ufw allow 3000
-sudo ufw allow 3001
+sudo ufw allow 3002
+sudo ufw allow 3003
 sudo ufw --force enable
 print_status "Firewall configured"
 
@@ -193,14 +193,14 @@ sleep 10
 
 # Test deployment
 print_info "Testing deployment..."
-if curl -f -s http://localhost:3000/v1/config/app-version > /dev/null; then
-    print_status "Backend API is responding"
+if curl -f -s http://localhost:3002/v1/config/app-version > /dev/null; then
+    print_status "Backend API is responding on port 3002"
 else
     print_warning "Backend API might still be starting..."
 fi
 
-if curl -f -s -I http://localhost:3001 > /dev/null; then
-    print_status "Frontend is responding"
+if curl -f -s -I http://localhost:3003 > /dev/null; then
+    print_status "Frontend is responding on port 3003"
 else
     print_warning "Frontend might still be starting..."
 fi
@@ -216,8 +216,8 @@ echo ""
 print_status "Your Lotus365 Work Platform is now live!"
 echo ""
 echo "🌐 Access URLs:"
-echo "   Backend API: http://$SERVER_IP:3000"
-echo "   Admin Panel: http://$SERVER_IP:3001"
+echo "   Backend API: http://$SERVER_IP:3002"
+echo "   Admin Panel: http://$SERVER_IP:3003"
 echo "   Main Site: http://$SERVER_IP (via Nginx)"
 echo ""
 echo "👤 Admin Login:"

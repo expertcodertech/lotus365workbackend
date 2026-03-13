@@ -1,8 +1,12 @@
 name: 🚀 Auto-Deploy Lotus365
 
-on:
-  push:
-    branches: [ main ]
+# Temporarily disabled - configure secrets first
+# on:
+#   push:
+#     branches: [ main ]
+
+# Uncomment the above 'on:' section after adding GitHub secrets:
+# VPS_HOST, VPS_USERNAME, VPS_SSH_KEY, VPS_PORT
 
 jobs:
   deploy:

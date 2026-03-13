@@ -58,6 +58,10 @@ else
     print_success "Docker is already installed"
 fi
 
+# Ensure user is in docker group
+print_status "Adding user to docker group..."
+sudo usermod -aG docker $USER
+
 # Install Docker Compose if not installed
 if ! command -v docker-compose &> /dev/null; then
     print_status "Installing Docker Compose..."
@@ -126,9 +130,22 @@ sudo ufw --force enable
 
 # Build and start containers
 print_status "Building and starting Docker containers..."
+
+# Use newgrp to apply docker group without logout
+newgrp docker << 'EONG'
+cd /opt/lotus365
 docker-compose down || true
 docker-compose build --no-cache
 docker-compose up -d
+EONG
+
+# Alternative: run with sudo if newgrp doesn't work
+if [ $? -ne 0 ]; then
+    print_warning "Using sudo for Docker commands..."
+    sudo docker-compose down || true
+    sudo docker-compose build --no-cache
+    sudo docker-compose up -d
+fi
 
 # Wait for services to start
 print_status "Waiting for services to start..."
@@ -144,7 +161,14 @@ fi
 
 # Display status
 print_status "Checking container status..."
+newgrp docker << 'EONG'
 docker-compose ps
+EONG
+
+# Alternative status check
+if [ $? -ne 0 ]; then
+    sudo docker-compose ps
+fi
 
 print_success "🎉 Lotus365 deployment completed!"
 echo ""

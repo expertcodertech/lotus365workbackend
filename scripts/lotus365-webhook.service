@@ -1,0 +1,29 @@
+[Unit]
+Description=Lotus365 Webhook Auto-Deploy Service
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=lotus365
+Group=lotus365
+WorkingDirectory=/opt/lotus365
+ExecStart=/usr/bin/node /opt/lotus365/scripts/webhook-server.js
+Restart=always
+RestartSec=10
+Environment=NODE_ENV=production
+Environment=WEBHOOK_PORT=9000
+Environment=WEBHOOK_SECRET=lotus365-webhook-secret-2026
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=lotus365-webhook
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/lotus365 /var/log /tmp
+
+[Install]
+WantedBy=multi-user.target

@@ -2,7 +2,7 @@ name: 🚀 Auto-Deploy Lotus365
 
 on:
   push:
-    branches: [ main ]
+    branches: [ lotus365 ]
 
 jobs:
   deploy:
@@ -24,7 +24,7 @@ jobs:
           
           # Pull latest code
           echo "📥 Pulling latest code..."
-          git pull origin main
+          git pull origin lotus365
           
           # Stop existing containers
           echo "🛑 Stopping containers..."

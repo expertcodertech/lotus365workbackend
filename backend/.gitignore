@@ -2,9 +2,9 @@
 node_modules/
 dist/
 
-# Environment
-.env
-.env.local
+# Environment (temporarily allowing .env for deployment)
+# .env
+# .env.local
 
 # IDE
 .idea/

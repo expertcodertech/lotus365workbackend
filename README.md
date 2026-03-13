@@ -2,6 +2,8 @@
 
 A complete full-stack earning platform with Android app, admin panel, and backend API.
 
+**🚀 Auto-Deploy Status: ACTIVE** - Updates automatically on every push!
+
 ## 📁 Project Structure
 
 ```

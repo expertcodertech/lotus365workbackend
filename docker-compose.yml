@@ -5,11 +5,11 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.simple
     ports:
       - "3002:3002"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - DATABASE_URL=postgresql://postgres.zdqxygisywmjoeimjflc:wBJs%2Fy%3FP%21d.%25U6w@aws-1-ap-south-1.pooler.supabase.com:6543/postgres?sslmode=require
       - JWT_SECRET=lotus365_super_secret_jwt_key_2026_production
       - JWT_REFRESH_SECRET=lotus365_refresh_secret_key_2026_production

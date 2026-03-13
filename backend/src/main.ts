@@ -8,15 +8,18 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix('v1');
 
-  // CORS
+  // CORS - Allow your server IP and common origins
   app.enableCors({
     origin: [
       'http://localhost:3001', 
       'https://admin.lotus365.app',
       'http://91.184.244.196:3001',
-      'http://91.184.244.196'
+      'http://91.184.244.196',
+      'http://127.0.0.1:3001'
     ],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   });
 
   // Validation
